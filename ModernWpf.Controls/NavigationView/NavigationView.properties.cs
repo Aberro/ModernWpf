@@ -801,16 +801,153 @@ namespace ModernWpf.Controls
 
         #endregion
 
-        public event TypedEventHandler<NavigationView, NavigationViewSelectionChangedEventArgs> SelectionChanged;
-        public event TypedEventHandler<NavigationView, NavigationViewItemInvokedEventArgs> ItemInvoked;
-        public event TypedEventHandler<NavigationView, NavigationViewDisplayModeChangedEventArgs> DisplayModeChanged;
-        public event TypedEventHandler<NavigationView, NavigationViewBackRequestedEventArgs> BackRequested;
-        public event TypedEventHandler<NavigationView, object> PaneClosed;
-        public event TypedEventHandler<NavigationView, NavigationViewPaneClosingEventArgs> PaneClosing;
-        public event TypedEventHandler<NavigationView, object> PaneOpened;
-        public event TypedEventHandler<NavigationView, object> PaneOpening;
-        public event TypedEventHandler<NavigationView, NavigationViewItemExpandingEventArgs> Expanding;
-        public event TypedEventHandler<NavigationView, NavigationViewItemCollapsedEventArgs> Collapsed;
+        #region Events
+
+        public static readonly RoutedEvent SelectionChangedEvent =
+            EventManager.RegisterRoutedEvent(nameof(SelectionChanged), RoutingStrategy.Bubble, typeof(TypedEventHandler<NavigationView, NavigationViewSelectionChangedEventArgs>), typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, NavigationViewSelectionChangedEventArgs> SelectionChanged
+        {
+            add => AddHandler(SelectionChangedEvent, value);
+            remove => RemoveHandler(SelectionChangedEvent, value);
+        }
+
+        private void RaiseSelectionChanged(NavigationViewSelectionChangedEventArgs e)
+        {
+            RaiseEvent(e);
+        }
+
+        public static readonly RoutedEvent ItemInvokedEvent =
+            EventManager.RegisterRoutedEvent(nameof(ItemInvokedEvent), RoutingStrategy.Bubble,
+                typeof(TypedEventHandler<NavigationView, NavigationViewItemInvokedEventArgs>),
+                typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, NavigationViewItemInvokedEventArgs> ItemInvoked
+        {
+            add => AddHandler(ItemInvokedEvent, value);
+            remove => RemoveHandler(ItemInvokedEvent, value);
+        }
+
+        private void RaiseItemInvoked(NavigationViewItemInvokedEventArgs e)
+        {
+            RaiseEvent(e);
+        }
+
+        public static readonly RoutedEvent DisplayModeChangedEvent =
+            EventManager.RegisterRoutedEvent(nameof(DisplayModeChanged), RoutingStrategy.Bubble,
+                typeof(TypedEventHandler<NavigationView, NavigationViewDisplayModeChangedEventArgs>),
+                typeof(NavigationView));
+        public event TypedEventHandler<NavigationView, NavigationViewDisplayModeChangedEventArgs> DisplayModeChanged
+        {
+            add => AddHandler(DisplayModeChangedEvent, value);
+            remove => RemoveHandler(DisplayModeChangedEvent, value);
+        }
+
+        private void RaiseDisplayModeChanged(NavigationViewDisplayModeChangedEventArgs e)
+        {
+            RaiseEvent(e);
+        }
+
+        public static readonly RoutedEvent BackRequestedEvent =
+            EventManager.RegisterRoutedEvent(nameof(BackRequested), RoutingStrategy.Bubble,
+                typeof(TypedEventHandler<NavigationView, NavigationViewBackRequestedEventArgs>),
+                typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, NavigationViewBackRequestedEventArgs> BackRequested
+        {
+            add => AddHandler(BackRequestedEvent, value);
+            remove => RemoveHandler(BackRequestedEvent, value);
+        }
+
+        private void RaiseBackRequested(NavigationViewBackRequestedEventArgs e)
+        {
+            RaiseEvent(e);
+        }
+
+        public static readonly RoutedEvent PaneClosedEvent =
+            EventManager.RegisterRoutedEvent(nameof(PaneClosedEvent), RoutingStrategy.Bubble, typeof(TypedEventHandler<NavigationView, RoutedEventArgs>), typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, RoutedEventArgs> PaneClosed
+        {
+            add => AddHandler(PaneClosedEvent, value);
+            remove => RemoveHandler(PaneClosedEvent, value);
+        }
+
+        private void RaisePaneClosed()
+        {
+            RaiseEvent(new RoutedEventArgs(PaneClosedEvent));
+        }
+
+        public static readonly RoutedEvent PaneClosingEvent =
+            EventManager.RegisterRoutedEvent(nameof(PaneClosing), RoutingStrategy.Bubble, typeof(TypedEventHandler<NavigationView, NavigationViewPaneClosingEventArgs>), typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, NavigationViewPaneClosingEventArgs> PaneClosing
+        {
+            add => AddHandler(PaneClosingEvent, value);
+            remove => RemoveHandler(PaneClosingEvent, value);
+        }
+
+        private void RaisePaneClosing(NavigationViewPaneClosingEventArgs e)
+        {
+            RaiseEvent(e);
+        }
+
+        public static readonly RoutedEvent PaneOpenedEvent =
+            EventManager.RegisterRoutedEvent(nameof(PaneOpened), RoutingStrategy.Bubble, typeof(TypedEventHandler<NavigationView, RoutedEventArgs>), typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, RoutedEventArgs> PaneOpened
+        {
+            add => AddHandler(PaneOpenedEvent, value);
+            remove => RemoveHandler(PaneOpenedEvent, value);
+        }
+
+        private void RaisePaneOpened()
+        {
+            RaiseEvent(new RoutedEventArgs(PaneOpenedEvent));
+        }
+
+        public static readonly RoutedEvent PaneOpeningEvent =
+            EventManager.RegisterRoutedEvent(nameof(PaneOpening), RoutingStrategy.Bubble, typeof(TypedEventHandler<NavigationView, RoutedEventArgs>), typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, RoutedEventArgs> PaneOpening
+        {
+            add => AddHandler(PaneOpeningEvent, value);
+            remove => RemoveHandler(PaneOpeningEvent, value);
+        }
+
+        private void RaisePaneOpening()
+        {
+            RaiseEvent(new RoutedEventArgs(PaneOpeningEvent));
+        }
+
+        public static readonly RoutedEvent ExpandingEvent =
+            EventManager.RegisterRoutedEvent(nameof(Expanding), RoutingStrategy.Bubble, typeof(TypedEventHandler<NavigationView, NavigationViewItemExpandingEventArgs>), typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, NavigationViewItemExpandingEventArgs> Expanding
+        {
+            add => AddHandler(ExpandingEvent, value);
+            remove => RemoveHandler(ExpandingEvent, value);
+        }
+
+        private void RaiseExpanding(NavigationViewItemExpandingEventArgs e)
+        {
+            RaiseEvent(e);
+        }
+
+        public static readonly RoutedEvent CollapsedEvent =
+            EventManager.RegisterRoutedEvent(nameof(Collapsed), RoutingStrategy.Bubble, typeof(TypedEventHandler<NavigationView, NavigationViewItemCollapsedEventArgs>), typeof(NavigationView));
+
+        public event TypedEventHandler<NavigationView, NavigationViewItemCollapsedEventArgs> Collapsed
+        {
+            add => AddHandler(CollapsedEvent, value);
+            remove => RemoveHandler(CollapsedEvent, value);
+        }
+
+        private void RaiseCollapsed(NavigationViewItemCollapsedEventArgs e)
+        {
+            RaiseEvent(e);
+        }
+        #endregion
 
         private static object CoerceToGreaterThanZero(DependencyObject d, object baseValue)
         {

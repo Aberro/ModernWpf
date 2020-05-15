@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Windows;
+
 namespace ModernWpf.Controls
 {
-    public sealed class NavigationViewItemCollapsedEventArgs
+    public sealed class NavigationViewItemCollapsedEventArgs : RoutedEventArgs
     {
-        internal NavigationViewItemCollapsedEventArgs(NavigationView navigationView)
+        internal NavigationViewItemCollapsedEventArgs(NavigationView navigationView) : base(NavigationView.CollapsedEvent)
         {
             m_navigationView = navigationView;
         }

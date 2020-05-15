@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Windows;
+
 namespace ModernWpf.Controls
 {
-    public sealed class NavigationViewItemExpandingEventArgs
+    public sealed class NavigationViewItemExpandingEventArgs : RoutedEventArgs
     {
-        internal NavigationViewItemExpandingEventArgs(NavigationView navigationView)
+        internal NavigationViewItemExpandingEventArgs(NavigationView navigationView) : base(NavigationView.ExpandingEvent)
         {
             m_navigationView = navigationView;
         }

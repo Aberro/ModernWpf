@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System.Windows;
+
 namespace ModernWpf.Controls
 {
-    public sealed class NavigationViewPaneClosingEventArgs
+    public sealed class NavigationViewPaneClosingEventArgs : RoutedEventArgs
     {
-        internal NavigationViewPaneClosingEventArgs()
+        internal NavigationViewPaneClosingEventArgs() : base(NavigationView.PaneClosingEvent)
         {
         }
 

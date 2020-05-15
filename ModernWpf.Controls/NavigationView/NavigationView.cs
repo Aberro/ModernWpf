@@ -1330,7 +1330,7 @@ namespace ModernWpf.Controls
             //if (SharedHelpers.IsRS3OrHigher())
             {
                 var eventArgs = new NavigationViewPaneClosingEventArgs();
-                PaneClosing?.Invoke(this, eventArgs);
+                RaisePaneClosing(eventArgs);
                 pendingPaneClosingCancel = eventArgs.Cancel;
             }
 
@@ -1355,25 +1355,22 @@ namespace ModernWpf.Controls
 
         void OnSplitViewPaneClosed(DependencyObject sender, object obj)
         {
-            PaneClosed?.Invoke(this, null);
+            RaisePaneClosed();
         }
 
         void OnSplitViewPaneClosing(DependencyObject sender, SplitViewPaneClosingEventArgs args)
         {
             bool pendingPaneClosingCancel = false;
-            if (PaneClosing != null)
+            if (!m_blockNextClosingEvent) // If this is true, we already sent one out "manually" and don't need to forward SplitView's event
             {
-                if (!m_blockNextClosingEvent) // If this is true, we already sent one out "manually" and don't need to forward SplitView's event
-                {
-                    var eventArgs = new NavigationViewPaneClosingEventArgs();
-                    eventArgs.SplitViewClosingArgs(args);
-                    PaneClosing(this, eventArgs);
-                    pendingPaneClosingCancel = eventArgs.Cancel;
-                }
-                else
-                {
-                    m_blockNextClosingEvent = false;
-                }
+                var eventArgs = new NavigationViewPaneClosingEventArgs();
+                eventArgs.SplitViewClosingArgs(args);
+                RaisePaneClosing(eventArgs);
+                pendingPaneClosingCancel = eventArgs.Cancel;
+            }
+            else
+            {
+                m_blockNextClosingEvent = false;
             }
 
             if (!pendingPaneClosingCancel) // will be set in above event!
@@ -1395,7 +1392,7 @@ namespace ModernWpf.Controls
 
         void OnSplitViewPaneOpened(DependencyObject sender, object obj)
         {
-            PaneOpened?.Invoke(this, null);
+            RaisePaneOpened();
         }
 
         void OnSplitViewPaneOpening(DependencyObject sender, object obj)
@@ -1406,7 +1403,7 @@ namespace ModernWpf.Controls
                 VisualStateManager.GoToState(this, "ListSizeFull", true /*useTransitions*/);
             }
 
-            PaneOpening?.Invoke(this, null);
+            RaisePaneOpening();
         }
 
         void UpdateIsClosedCompact()
@@ -1475,7 +1472,7 @@ namespace ModernWpf.Controls
         void OnBackButtonClicked(object sender, RoutedEventArgs args)
         {
             var eventArgs = new NavigationViewBackRequestedEventArgs();
-            BackRequested?.Invoke(this, eventArgs);
+            RaiseBackRequested(eventArgs);
         }
 
         bool IsOverlay()
@@ -2069,7 +2066,7 @@ namespace ModernWpf.Controls
                 eventArgs.SelectedItemContainer = container;
             }
             eventArgs.RecommendedNavigationTransitionInfo = CreateNavigationTransitionInfo(recommendedDirection);
-            SelectionChanged?.Invoke(this, eventArgs);
+            RaiseSelectionChanged(eventArgs);
         }
 
         // SelectedItem change can be invoked by API or user's action like clicking. if it's not from API, m_shouldRaiseInvokeItemInSelectionChange would be true
@@ -2233,7 +2230,7 @@ namespace ModernWpf.Controls
             eventArgs.InvokedItemContainer = invokedContainer;
             eventArgs.IsSettingsInvoked = isSettings;
             eventArgs.RecommendedNavigationTransitionInfo = CreateNavigationTransitionInfo(recommendedDirection);
-            ItemInvoked?.Invoke(this, eventArgs);
+            RaiseItemInvoked(eventArgs);
         }
 
         // forceSetDisplayMode: On first call to SetDisplayMode, force setting to initial values
@@ -4432,7 +4429,7 @@ namespace ModernWpf.Controls
             SetValue(DisplayModePropertyKey, displayMode);
             var eventArgs = new NavigationViewDisplayModeChangedEventArgs();
             eventArgs.DisplayMode = displayMode;
-            DisplayModeChanged?.Invoke(this, eventArgs);
+            RaiseDisplayModeChanged(eventArgs);
         }
 
         // This method attaches the series of animations which are fired off dependent upon the amount 
@@ -5189,14 +5186,14 @@ namespace ModernWpf.Controls
         {
             var eventArgs = new NavigationViewItemExpandingEventArgs(this);
             eventArgs.ExpandingItemContainer = container;
-            Expanding?.Invoke(this, eventArgs);
+            RaiseExpanding(eventArgs);
         }
 
         void RaiseCollapsedEvent(NavigationViewItemBase container)
         {
             var eventArgs = new NavigationViewItemCollapsedEventArgs(this);
             eventArgs.CollapsedItemContainer = container;
-            Collapsed?.Invoke(this, eventArgs);
+            RaiseCollapsed(eventArgs);
         }
 
         bool IsTopLevelItem(NavigationViewItemBase nvib)
