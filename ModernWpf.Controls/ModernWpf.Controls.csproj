@@ -10,6 +10,10 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
+    <OutputPath>..\..\..\binaries\ModernWpf\</OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="AutoSuggestBox\AutoSuggestBoxHelper.cs" />
   </ItemGroup>

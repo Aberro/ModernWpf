@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace ModernWpf.Controls
 {
@@ -797,6 +798,38 @@ namespace ModernWpf.Controls
         {
             var owner = (NavigationView)sender;
             owner.PropertyChanged(args);
+        }
+
+        #endregion
+
+        #region PaneBackground
+
+        public static readonly DependencyProperty PaneBackgroundProperty =
+            DependencyProperty.Register(
+                nameof(PaneBackground),
+                typeof(Brush),
+                typeof(NavigationView));
+
+        public Brush PaneBackground
+        {
+            get => (Brush)GetValue(PaneBackgroundProperty);
+            set => SetValue(PaneBackgroundProperty, value);
+        }
+
+        #endregion
+
+        #region ExpandedPaneBackground
+
+        public static readonly DependencyProperty ExpandedPaneBackgroundProperty =
+            DependencyProperty.Register(
+                nameof(ExpandedPaneBackground),
+                typeof(Brush),
+                typeof(NavigationView));
+
+        public Brush ExpandedPaneBackground
+        {
+            get => (Brush)GetValue(ExpandedPaneBackgroundProperty);
+            set => SetValue(ExpandedPaneBackgroundProperty, value);
         }
 
         #endregion

@@ -8,6 +8,11 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
+    <DocumentationFile>obj\Debug\net45\ModernWpf.xml</DocumentationFile>
+    <OutputPath>..\..\..\binaries\ModernWpf\</OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Runtime.WindowsRuntime" Version="4.7.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
