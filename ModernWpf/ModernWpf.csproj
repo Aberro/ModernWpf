@@ -9,6 +9,10 @@
     <UseWinRT>true</UseWinRT>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
   <ItemGroup Condition="!$(DefineConstants.Contains('NET47_OR_NEWER'))">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>

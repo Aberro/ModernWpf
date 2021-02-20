@@ -12,6 +12,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
     <OutputPath>..\..\..\binaries\ModernWpf\</OutputPath>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>
