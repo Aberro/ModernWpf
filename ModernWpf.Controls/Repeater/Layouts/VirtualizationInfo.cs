@@ -50,6 +50,8 @@ namespace ModernWpf.Controls
 
         public bool IsInUniqueIdResetPool => Owner == ElementOwner.UniqueIdResetPool;
 
+        public bool MustClearDataContext { get; set; }
+
         public void MoveOwnershipToLayoutFromElementFactory(int index, string uniqueId)
         {
             Debug.Assert(Owner == ElementOwner.ElementFactory);
@@ -144,6 +146,8 @@ namespace ModernWpf.Controls
         public bool KeepAlive { get; set; } = false;
 
         public bool AutoRecycleCandidate { get; set; } = false;
+
+        public Size DesiredSize { get; set; } = Size.Empty;
 
         private uint m_pinCounter = 0u;
     }

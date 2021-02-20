@@ -11,6 +11,7 @@ using MUXControlsTestApp;
 using ModernWpf.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows;
+using System.Windows.Input;
 
 #if USING_TAEF
 using WEX.TestExecution;
@@ -26,6 +27,26 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
     [TestClass]
     public class NumberBoxTests : ApiTestBase
     {
+        [TestMethod]
+        public void VerifyTextAlignmentPropogates()
+        {
+            var numberBox = SetupNumberBox();
+            TextBox textBox = null;
+
+            RunOnUIThread.Execute(() =>
+            {
+                Content.UpdateLayout();
+
+                textBox = TestUtilities.FindDescendents<TextBox>(numberBox).Where(e => e.Name == "InputBox").Single();
+                Verify.AreEqual(TextAlignment.Left, textBox.TextAlignment, "The default TextAlignment should be left.");
+
+                numberBox.TextAlignment = TextAlignment.Right;
+                Content.UpdateLayout();
+
+                Verify.AreEqual(TextAlignment.Right, textBox.TextAlignment, "The TextAlignment should have been updated to Right.");
+            });
+        }
+
         [TestMethod]
         public void VerifyNumberBoxCornerRadius()
         {
@@ -85,6 +106,71 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
                 Content.UpdateLayout();
 
                 Verify.AreEqual(new CornerRadius(0), textBox.GetCornerRadius());
+            });
+        }
+
+        [TestMethod]
+        public void VerifyInputScopePropogates()
+        {
+            var numberBox = SetupNumberBox();
+
+            RunOnUIThread.Execute(() =>
+            {
+                Content.UpdateLayout();
+                var inputTextBox = TestUtilities.FindDescendents<TextBox>(numberBox).Where(e => e.Name == "InputBox").Single();
+
+                Verify.AreEqual(1, inputTextBox.InputScope.Names.Count);
+                Verify.AreEqual(InputScopeNameValue.Number, ((InputScopeName)inputTextBox.InputScope.Names[0]).NameValue, "The default InputScope should be 'Number'.");
+
+                var scopeName = new InputScopeName();
+                scopeName.NameValue = InputScopeNameValue.CurrencyAmountAndSymbol;
+                var scope = new InputScope();
+                scope.Names.Add(scopeName);
+
+                numberBox.InputScope = scope;
+                Content.UpdateLayout();
+
+                Verify.AreEqual(1, inputTextBox.InputScope.Names.Count);
+                Verify.AreEqual(InputScopeNameValue.CurrencyAmountAndSymbol, ((InputScopeName)inputTextBox.InputScope.Names[0]).NameValue, "The InputScope should be 'CurrencyAmountAndSymbol'.");
+            });
+
+            return;
+        }
+
+        [TestMethod]
+        public void VerifyIsEnabledChangeUpdatesVisualState()
+        {
+            var numberBox = SetupNumberBox();
+
+            VisualStateGroup commonStatesGroup = null;
+            RunOnUIThread.Execute(() =>
+            {
+                // Check 1: Set IsEnabled to true.
+                numberBox.IsEnabled = true;
+                Content.UpdateLayout();
+
+                var numberBoxLayoutRoot = (FrameworkElement)VisualTreeHelper.GetChild(numberBox, 0);
+                commonStatesGroup = VisualStateManager.GetVisualStateGroups(numberBoxLayoutRoot).Cast<VisualStateGroup>().First(vsg => vsg.Name.Equals("CommonStates"));
+
+                Verify.AreEqual("Normal", commonStatesGroup.CurrentState.Name);
+
+                // Check 2: Set IsEnabled to false.
+                numberBox.IsEnabled = false;
+            });
+            IdleSynchronizer.Wait();
+
+            RunOnUIThread.Execute(() =>
+            {
+                Verify.AreEqual("Disabled", commonStatesGroup.CurrentState.Name);
+
+                // Check 3: Set IsEnabled back to true.
+                numberBox.IsEnabled = true;
+            });
+            IdleSynchronizer.Wait();
+
+            RunOnUIThread.Execute(() =>
+            {
+                Verify.AreEqual("Normal", commonStatesGroup.CurrentState.Name);
             });
         }
 

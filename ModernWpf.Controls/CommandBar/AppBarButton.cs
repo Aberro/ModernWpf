@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using ModernWpf.Controls.Primitives;
@@ -278,22 +276,6 @@ namespace ModernWpf.Controls
 
         #endregion
 
-        #region HasInputGestureText
-
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty HasInputGestureTextProperty =
-            AppBarElementProperties.HasInputGestureTextProperty.AddOwner(typeof(AppBarButton));
-
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool HasInputGestureText
-        {
-            get => (bool)GetValue(HasInputGestureTextProperty);
-        }
-
-        #endregion
-
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -377,36 +359,41 @@ namespace ModernWpf.Controls
 
         private void UpdateCommonState(bool useTransitions = true)
         {
+            if (_vsm is null)
+            {
+                return;
+            }
+
             string stateName;
 
             if (!IsEnabled)
             {
                 stateName = "Disabled";
             }
-            else if (IsPressed)
-            {
-                stateName = "Pressed";
-            }
-            else if (IsMouseOver)
-            {
-                stateName = "PointerOver";
-            }
             else
             {
-                stateName = "Normal";
+                if (IsPressed)
+                {
+                    stateName = "Pressed";
+                }
+                else if (IsMouseOver)
+                {
+                    stateName = "PointerOver";
+                }
+                else
+                {
+                    stateName = "Normal";
+                }
+
+                if (IsInOverflow)
+                {
+                    stateName = "Overflow" + stateName;
+                }
             }
 
-            if (IsInOverflow)
-            {
-                stateName = "Overflow" + stateName;
-            }
-
-            if (_vsm != null)
-            {
-                _vsm.CanChangeCommonState = true;
-                VisualStateManager.GoToState(this, stateName, useTransitions);
-                _vsm.CanChangeCommonState = false;
-            }
+            _vsm.CanChangeCommonState = true;
+            VisualStateManager.GoToState(this, stateName, useTransitions);
+            _vsm.CanChangeCommonState = false;
         }
 
         private void UpdateKeyboardAcceleratorTextVisibility(bool useTransitions = true)

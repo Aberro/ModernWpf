@@ -1,12 +1,14 @@
-﻿using ModernWpf.Controls.Primitives;
-using System;
-using System.ComponentModel;
+﻿using System;
 using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using ModernWpf.Automation.Peers;
+using ModernWpf.Controls.Primitives;
 
 namespace ModernWpf.Controls
 {
@@ -224,29 +226,6 @@ namespace ModernWpf.Controls
 
         #endregion
 
-        #region IsPressed
-
-        private static readonly DependencyPropertyKey IsPressedPropertyKey =
-            DependencyProperty.RegisterReadOnly(
-                nameof(IsPressed),
-                typeof(bool),
-                typeof(ToggleSwitch),
-                null);
-
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static readonly DependencyProperty IsPressedProperty = IsPressedPropertyKey.DependencyProperty;
-
-        [Obsolete]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool IsPressed
-        {
-            get => (bool)GetValue(IsPressedProperty);
-            private set => SetValue(IsPressedPropertyKey, value);
-        }
-
-        #endregion
-
         #region UseSystemFocusVisuals
 
         public static readonly DependencyProperty UseSystemFocusVisualsProperty =
@@ -328,7 +307,7 @@ namespace ModernWpf.Controls
 
                 if (_bitmapCache == null)
                 {
-#if NETCOREAPP || NET462
+#if NET462_OR_NEWER
                     _bitmapCache = new BitmapCache(VisualTreeHelper.GetDpi(this).PixelsPerDip);
 #else
                     _bitmapCache = new BitmapCache(2);
@@ -342,9 +321,21 @@ namespace ModernWpf.Controls
             UpdateVisualStates(false);
         }
 
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new ToggleSwitchAutomationPeer(this);
+        }
+
         protected virtual void OnToggled()
         {
             RaiseEvent(new RoutedEventArgs(ToggledEvent));
+
+            if (UIElementAutomationPeer.FromElement(this) is { } peer)
+            {
+                var newValue = IsOn ? ToggleState.On : ToggleState.Off;
+                var oldValue = (newValue == ToggleState.On) ? ToggleState.Off : ToggleState.On;
+                peer.RaisePropertyChangedEvent(TogglePatternIdentifiers.ToggleStateProperty, oldValue, newValue);
+            }
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -367,7 +358,7 @@ namespace ModernWpf.Controls
             }
         }
 
-#if NETCOREAPP || NET462
+#if NET462_OR_NEWER
         protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
         {
             base.OnDpiChanged(oldDpi, newDpi);
@@ -403,7 +394,6 @@ namespace ModernWpf.Controls
         private void OnSwitchThumbDragStarted(object sender, DragStartedEventArgs e)
         {
             e.Handled = true;
-            IsPressed = true;
             _startTranslation = KnobTranslateTransform.X;
             UpdateVisualStates(true);
             KnobTranslateTransform.X = _startTranslation;
@@ -423,7 +413,6 @@ namespace ModernWpf.Controls
         private void OnSwitchThumbDragCompleted(object sender, DragCompletedEventArgs e)
         {
             e.Handled = true;
-            IsPressed = false;
             bool click = false;
             if (_wasDragged)
             {
@@ -467,10 +456,6 @@ namespace ModernWpf.Controls
             {
                 stateName = VisualStates.StateDisabled;
             }
-            else if (IsPressed)
-            {
-                stateName = VisualStates.StatePressed;
-            }
             else if (IsMouseOver)
             {
                 stateName = VisualStates.StateMouseOver;
@@ -494,7 +479,7 @@ namespace ModernWpf.Controls
             VisualStateManager.GoToState(this, IsOn ? OnContentState : OffContentState, useTransitions);
         }
 
-        private void Toggle()
+        internal void Toggle()
         {
             SetCurrentValue(IsOnProperty, !IsOn);
         }

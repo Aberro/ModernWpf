@@ -27,8 +27,6 @@ namespace ModernWpf.Controls
 
         public RadioButtons()
         {
-            SetCurrentValue(ItemTemplateProperty, new RadioButtonsElementFactory());
-
             var items = new ObservableCollection<object>();
             SetValue(ItemsProperty, items);
 
@@ -36,6 +34,10 @@ namespace ModernWpf.Controls
             // left and right should be spacial but contained to the RadioButtons control. We have to attach to PreviewKeyDown
             // because RadioButton has a key down handler for up and down that gets called before we can intercept. Issue #1634.
             PreviewKeyDown += OnChildPreviewKeyDown;
+
+            m_radioButtonsElementFactory = new RadioButtonsElementFactory();
+
+            IsEnabledChanged += OnIsEnabledChanged;
         }
 
         #region ItemsSource
@@ -87,12 +89,18 @@ namespace ModernWpf.Controls
             DependencyProperty.Register(
                 nameof(ItemTemplate),
                 typeof(object),
-                typeof(RadioButtons));
+                typeof(RadioButtons),
+                new FrameworkPropertyMetadata(OnItemTemplateChanged));
 
         public object ItemTemplate
         {
             get => GetValue(ItemTemplateProperty);
             set => SetValue(ItemTemplateProperty, value);
+        }
+
+        private static void OnItemTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((RadioButtons)d).UpdateItemTemplate();
         }
 
         #endregion
@@ -228,6 +236,8 @@ namespace ModernWpf.Controls
 
             if (m_repeater != null)
             {
+                m_repeater.ItemTemplate = m_radioButtonsElementFactory;
+
                 m_repeater.ElementPrepared += OnRepeaterElementPrepared;
                 m_repeater.ElementClearing += OnRepeaterElementClearing;
                 m_repeater.ElementIndexChanged += OnRepeaterElementIndexChanged;
@@ -242,9 +252,9 @@ namespace ModernWpf.Controls
             }
 
             UpdateItemsSource();
+            UpdateVisualStateForIsEnabledChange();
         }
 
-        // void OnGettingFocus(object sender, GettingFocusEventArgs args);
         // When focus comes from outside the RadioButtons control we will put focus on the selected radio button.
         protected override void OnPreviewGotKeyboardFocus(KeyboardFocusChangedEventArgs args)
         {
@@ -414,13 +424,14 @@ namespace ModernWpf.Controls
                     toggleButton.Checked += OnChildChecked;
                     toggleButton.Unchecked += OnChildUnchecked;
 
+                    // If the developer adds a checked toggle button to the collection, update selection to this item.
                     if (toggleButton.IsChecked == true)
                     {
                         m_blockSelecting = false; // WPF-specific fix to ensure IsChecked is honored
                         Select(args.Index);
                     }
                 }
-#if NETCOREAPP
+#if NET48_OR_NEWER
                 var repeater = m_repeater;
                 if (repeater != null)
                 {
@@ -462,7 +473,7 @@ namespace ModernWpf.Controls
             var element = args.Element;
             if (element != null)
             {
-#if NETCOREAPP
+#if NET48_OR_NEWER
                 element.SetValue(AutomationProperties.PositionInSetProperty, args.NewIndex + 1);
 #endif
                 // When the selected item's index changes, update selection to match
@@ -478,7 +489,7 @@ namespace ModernWpf.Controls
 
         void OnRepeaterCollectionChanged(object sender, object args)
         {
-#if NETCOREAPP
+#if NET48_OR_NEWER
             var repeater = m_repeater;
             if (repeater != null)
             {
@@ -633,6 +644,11 @@ namespace ModernWpf.Controls
             return false;
         }
 
+        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            UpdateVisualStateForIsEnabledChange();
+        }
+
         public UIElement ContainerFromIndex(int index)
         {
             var repeater = m_repeater;
@@ -700,6 +716,16 @@ namespace ModernWpf.Controls
                     }
                 }
             }
+        }
+
+        private void UpdateItemTemplate()
+        {
+            m_radioButtonsElementFactory.UserElementFactory(ItemTemplate);
+        }
+
+        private void UpdateVisualStateForIsEnabledChange()
+        {
+            VisualStateManager.GoToState(this, IsEnabled ? "Normal" : "Disabled", false);
         }
 
         // Test Hooks helpers, only function when m_testHooksEnabled == true
@@ -797,6 +823,8 @@ namespace ModernWpf.Controls
         bool m_currentlySettingFocus = false;
 
         ItemsRepeater m_repeater;
+
+        RadioButtonsElementFactory m_radioButtonsElementFactory;
 
         //Test hooks helpers, only function while m_testHooksEnabled == true
         bool m_testHooksEnabled = false;

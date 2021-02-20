@@ -105,7 +105,7 @@ namespace ModernWpf.Controls.Primitives
                     InputHelper.AddTappedHandler(expandCollapseChevron, navigationViewItem.OnExpandCollapseChevronTapped);
                 }
                 navigationViewItem.UpdateVisualStateNoTransition();
-
+                navigationViewItem.UpdateIsClosedCompact();
 
                 // We probably switched displaymode, so restore width now, otherwise the next time we will restore is when the CompactPaneLength changes
                 if (navigationViewItem.GetNavigationView() is { } navigationView)
@@ -218,9 +218,23 @@ namespace ModernWpf.Controls.Primitives
             {
                 if (GetTemplateChildT<ColumnDefinition>(c_iconBoxColumnDefinitionName, this) is { } iconGridColumn)
                 {
-                    iconGridColumn.Width = new GridLength(compactPaneLength);
+                    ColumnDefinitionHelper.SetPixelWidth(iconGridColumn, compactPaneLength);
                 }
             }
+        }
+
+        internal void UpdateClosedCompactVisualState(bool isTopLevelItem, bool isClosedCompact)
+        {
+            // We increased the ContentPresenter margin to align it visually with the expand/collapse chevron. This updated margin is even applied when the
+            // NavigationView is in a visual state where no expand/collapse chevrons are shown, leading to more content being cut off than necessary.
+            // This is the case for top-level items when the NavigationView is in a compact mode and the NavigationView pane is closed. To keep the original
+            // cutoff visual experience intact, we restore  the original ContentPresenter margin for such top-level items only (children shown in a flyout
+            // will use the updated margin).
+            var stateName = isClosedCompact && isTopLevelItem
+                ? "ClosedCompactAndTopLevelItem"
+                : "NotClosedCompactAndTopLevelItem";
+
+            VisualStateManager.GoToState(this, stateName, false /*useTransitions*/);
         }
 
         DependencyObject IControlProtected.GetTemplateChild(string childName)

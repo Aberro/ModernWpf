@@ -39,7 +39,6 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="MinWidth" Value="{DynamicResource ListViewItemMinWidth}" />
         <Setter Property="MinHeight" Value="{DynamicResource TreeViewItemMinHeight}" />
-        <Setter Property="AllowDrop" Value="False" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
         <Setter Property="primitives:FocusVisualHelper.UseSystemFocusVisuals" Value="{DynamicResource UseSystemFocusVisuals}" />
         <Setter Property="primitives:TreeViewItemHelper.IsEnabled" Value="True" />
@@ -90,7 +89,8 @@
                                             FontSize="{TemplateBinding primitives:TreeViewItemHelper.GlyphSize}"
                                             Data="{TemplateBinding primitives:TreeViewItemHelper.CollapsedPath}"
                                             FontFamily="{DynamicResource SymbolThemeFontFamily}"
-                                            VerticalAlignment="Center" />
+                                            VerticalAlignment="Center"
+                                            IsHitTestVisible="False"/>
                                         <local:FontIconFallback
                                             x:Name="ExpandedGlyph"
                                             Foreground="{TemplateBinding primitives:TreeViewItemHelper.GlyphBrush}"
@@ -100,7 +100,8 @@
                                             FontSize="{TemplateBinding primitives:TreeViewItemHelper.GlyphSize}"
                                             Data="{TemplateBinding primitives:TreeViewItemHelper.ExpandedPath}"
                                             FontFamily="{DynamicResource SymbolThemeFontFamily}"
-                                            VerticalAlignment="Center" />
+                                            VerticalAlignment="Center"
+                                            IsHitTestVisible="False"/>
                                     </Grid>
                                 </ToggleButton>
 

@@ -314,7 +314,10 @@ namespace ModernWpf.Controls
                         break;
 
                     case NotifyCollectionChangedAction.Move:
-                        throw new NotImplementedException();
+                        int size = args.OldItems != null ? args.OldItems.Count : 1;
+                        OnItemsRemoved(args.OldStartingIndex, size);
+                        OnItemsAdded(args.NewStartingIndex, size);
+                        break;
                 }
             }
         }
@@ -422,7 +425,7 @@ namespace ModernWpf.Controls
             // to insert items.
             int lastRealizedDataIndex = m_firstRealizedDataIndex + GetRealizedElementCount() - 1;
             int newStartingIndex = index;
-            if (newStartingIndex > m_firstRealizedDataIndex &&
+            if (newStartingIndex >= m_firstRealizedDataIndex &&
                 newStartingIndex <= lastRealizedDataIndex)
             {
                 // Inserted within the realized range

@@ -12,7 +12,7 @@ using ModernWpf.Automation.Peers;
 
 namespace ModernWpf.Controls
 {
-    public class NumberBoxValueChangedEventArgs
+    public class NumberBoxValueChangedEventArgs : EventArgs
     {
         public NumberBoxValueChangedEventArgs(double oldValue, double newValue)
         {
@@ -58,6 +58,21 @@ namespace ModernWpf.Controls
 
             GotKeyboardFocus += OnNumberBoxGotFocus;
             LostKeyboardFocus += OnNumberBoxLostFocus;
+
+            SetDefaultInputScope();
+        }
+
+        void SetDefaultInputScope()
+        {
+            // Sets the default value of the InputScope property.
+            // Note that InputScope is a class that cannot be set to a default value within the IDL.
+            var inputScopeName = new InputScopeName(InputScopeNameValue.Number);
+            var inputScope = new InputScope();
+            inputScope.Names.Add(inputScopeName);
+
+            SetValue(InputScopeProperty, inputScope);
+
+            return;
         }
 
         private INumberBoxNumberFormatter GetRegionalSettingsAwareDecimalFormatter()
@@ -159,11 +174,15 @@ namespace ModernWpf.Controls
                 popupSpinUp.Click += OnSpinUpClick;
             }
 
+            IsEnabledChanged += OnIsEnabledChanged;
+
             // .NET rounds to 12 significant digits when displaying doubles, so we will do the same.
             //m_displayRounder.SignificantDigits(12);
 
             UpdateSpinButtonPlacement();
             UpdateSpinButtonEnabled();
+
+            UpdateVisualStateForIsEnabledChange();
 
             if (ReadLocalValue(ValueProperty) == DependencyProperty.UnsetValue
                 && ReadLocalValue(TextProperty) != DependencyProperty.UnsetValue)
@@ -302,6 +321,16 @@ namespace ModernWpf.Controls
         {
             ValidateInput();
             UpdateSpinButtonEnabled();
+        }
+
+        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs args)
+        {
+            UpdateVisualStateForIsEnabledChange();
+        }
+
+        private void UpdateVisualStateForIsEnabledChange()
+        {
+            VisualStateManager.GoToState(this, IsEnabled ? "Normal" : "Disabled", false);
         }
 
         private void OnNumberBoxGotFocus(object sender, RoutedEventArgs e)
@@ -512,7 +541,11 @@ namespace ModernWpf.Controls
                     }
                 }
 
-                SetCurrentValue(ValueProperty, newVal); ;
+                SetCurrentValue(ValueProperty, newVal);
+
+                // We don't want the caret to move to the front of the text for example when using the up/down arrows
+                // to change the numberbox value.
+                MoveCaretToTextEnd();
             }
         }
 
@@ -536,11 +569,7 @@ namespace ModernWpf.Controls
                 try
                 {
                     m_textUpdating = true;
-
                     SetCurrentValue(TextProperty, newText);
-
-                    // This places the caret at the end of the text.
-                    m_textBox.Select(newText.Length, 0);
                 }
                 finally
                 {
@@ -644,6 +673,15 @@ namespace ModernWpf.Controls
             if (m_headerPresenter != null)
             {
                 m_headerPresenter.Visibility = shouldShowHeader ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        private void MoveCaretToTextEnd()
+        {
+            if (m_textBox is { } textBox)
+            {
+                // This places the caret at the end of the text.
+                textBox.Select(textBox.Text.Length, 0);
             }
         }
 

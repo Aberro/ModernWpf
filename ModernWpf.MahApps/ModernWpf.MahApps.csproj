@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;net46;net462;net47;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net452;net46;net462;net47;netcoreapp3.0;netcoreapp3.1;net5.0-windows10.0.18362.0</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <NeutralLanguage>en-US</NeutralLanguage>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -19,11 +19,11 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-
+	
   <ItemGroup>
-    <PackageReference Include="MahApps.Metro" Version="2.0.0-alpha0821" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.3" />
   </ItemGroup>
-
+	
   <ItemGroup>
     <ProjectReference Include="..\ModernWpf\ModernWpf.csproj">
       <PrivateAssets>all</PrivateAssets>
@@ -45,16 +45,6 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
       <CustomToolNamespace>ModernWpf.MahApps</CustomToolNamespace>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Themes\HamburgerMenuEx.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Styles\Controls.NumericUpDown.xaml">
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
 
 </Project>

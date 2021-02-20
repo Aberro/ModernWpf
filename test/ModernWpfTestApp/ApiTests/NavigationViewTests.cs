@@ -64,7 +64,6 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
             return navView;
         }
 
-
         private NavigationView SetupNavigationViewScrolling(NavigationViewPaneDisplayMode paneDisplayMode = NavigationViewPaneDisplayMode.Auto)
         {
             NavigationView navView = null;
@@ -282,6 +281,166 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
         }
 
         [TestMethod]
+        public void VerifyPaneDisplayModeAndIsPaneOpenInterplayOnNavViewLaunch()
+        {
+            Log.Comment("--- PaneDisplayMode: LeftMinimal ---");
+            VerifyForPaneDisplayModeLeftMinimal();
+
+            Log.Comment("--- PaneDisplayMode: LeftCompact ---");
+            VerifyForPaneDisplayModeLeftCompact();
+
+            Log.Comment("--- PaneDisplayMode: Left ---");
+            VerifyForPaneDisplayModeLeft();
+
+            Log.Comment("--- PaneDisplayMode: Auto ---");
+            VerifyForPaneDisplayModeAuto();
+
+            void VerifyForPaneDisplayModeLeftMinimal()
+            {
+                Log.Comment("Verify pane is closed when IsPaneOpen=true");
+                var navView = SetupNavView(NavigationViewPaneDisplayMode.LeftMinimal, true);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+
+                Log.Comment("Verify pane is closed when IsPaneOpen=false");
+                navView = SetupNavView(NavigationViewPaneDisplayMode.LeftMinimal, false);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+            }
+
+            void VerifyForPaneDisplayModeLeftCompact()
+            {
+                Log.Comment("Verify pane is closed when IsPaneOpen=true");
+                var navView = SetupNavView(NavigationViewPaneDisplayMode.LeftCompact, true);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+
+                Log.Comment("Verify pane is closed when IsPaneOpen=false");
+                navView = SetupNavView(NavigationViewPaneDisplayMode.LeftCompact, false);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+            }
+
+            void VerifyForPaneDisplayModeLeft()
+            {
+                Log.Comment("Verify pane is open when IsPaneOpen=true");
+                var navView = SetupNavView(NavigationViewPaneDisplayMode.Left, true);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsTrue(navView.IsPaneOpen, "NavigationView pane should have been open");
+                });
+
+                Log.Comment("Verify pane is closed when IsPaneOpen=false");
+                navView = SetupNavView(NavigationViewPaneDisplayMode.Left, false);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+            }
+
+            void VerifyForPaneDisplayModeAuto()
+            {
+                Log.Comment("Verify pane is closed when launched in minimal state and IsPaneOpen=true");
+                var navView = SetupNavView(NavigationViewPaneDisplayMode.Auto, true, NavigationViewDisplayMode.Minimal);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+                
+                Log.Comment("Verify pane is closed when launched in compact state and IsPaneOpen=true");
+                navView = SetupNavView(NavigationViewPaneDisplayMode.Auto, true, NavigationViewDisplayMode.Compact);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+
+                Log.Comment("Verify pane is open when launched in expanded state and IsPaneOpen=true");
+                navView = SetupNavView(NavigationViewPaneDisplayMode.Auto, true, NavigationViewDisplayMode.Expanded);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsTrue(navView.IsPaneOpen, "NavigationView pane should have been open");
+                });
+
+                Log.Comment("Verify pane is closed when launched in minimal state and IsPaneOpen=false");
+                navView = SetupNavView(NavigationViewPaneDisplayMode.Auto, false, NavigationViewDisplayMode.Minimal);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+
+                Log.Comment("Verify pane is closed when launched in compact state and IsPaneOpen=false");
+                navView = SetupNavView(NavigationViewPaneDisplayMode.Auto, false, NavigationViewDisplayMode.Compact);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+
+                Log.Comment("Verify pane is closed when launched in expanded state and IsPaneOpen=false");
+                navView = SetupNavView(NavigationViewPaneDisplayMode.Auto, false, NavigationViewDisplayMode.Expanded);
+
+                RunOnUIThread.Execute(() =>
+                {
+                    Verify.IsFalse(navView.IsPaneOpen, "NavigationView pane should have been closed");
+                });
+            }
+
+            NavigationView SetupNavView(NavigationViewPaneDisplayMode paneDisplayMode, bool isPaneOpen, NavigationViewDisplayMode displayMode = NavigationViewDisplayMode.Expanded)
+            {
+                NavigationView navView = null;
+                RunOnUIThread.Execute(() =>
+                {
+                    navView = new NavigationView();
+                    navView.MenuItems.Add(new NavigationViewItem() { Content = "MenuItem" });
+
+                    navView.PaneDisplayMode = paneDisplayMode;
+                    navView.IsPaneOpen = isPaneOpen;
+                    navView.ExpandedModeThresholdWidth = 600.0;
+                    navView.CompactModeThresholdWidth = 400.0;
+
+                    if (paneDisplayMode == NavigationViewPaneDisplayMode.Auto)
+                    {
+                        switch (displayMode)
+                        {
+                            case NavigationViewDisplayMode.Minimal:
+                                navView.Width = navView.CompactModeThresholdWidth - 10.0;
+                                break;
+                            case NavigationViewDisplayMode.Compact:
+                                navView.Width = navView.ExpandedModeThresholdWidth - 10.0;
+                                break;
+                            case NavigationViewDisplayMode.Expanded:
+                                navView.Width = navView.ExpandedModeThresholdWidth + 10.0;
+                                break;
+                        }
+                    }
+
+                    Content = navView;
+                });
+
+                IdleSynchronizer.Wait();
+                return navView;
+            }
+        }
+
+        [TestMethod]
         public void VerifyDefaultsAndBasicSetting()
         {
             NavigationView navView = null;
@@ -422,13 +581,19 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
         [TestMethod]
         public void VerifySingleSelection()
         {
+            string navItemPresenter1CurrentState = string.Empty;
+            string navItemPresenter2CurrentState = string.Empty;
+            NavigationView navView = null;
+            NavigationViewItem menuItem1 = null;
+            NavigationViewItem menuItem2 = null;
+
             RunOnUIThread.Execute(() =>
             {
-                var navView = new NavigationView();
+                navView = new NavigationView();
                 Content = navView;
 
-                var menuItem1 = new NavigationViewItem();
-                var menuItem2 = new NavigationViewItem();
+                menuItem1 = new NavigationViewItem();
+                menuItem2 = new NavigationViewItem();
                 menuItem1.Content = "Item 1";
                 menuItem2.Content = "Item 2";
 
@@ -437,23 +602,69 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
                 navView.Width = 1008; // forces the control into Expanded mode so that the menu renders
                 Content.UpdateLayout(true);
 
+                var menuItemLayoutRoot = VisualTreeHelper.GetChild(menuItem1, 0) as FrameworkElement;
+                var navItemPresenter = VisualTreeHelper.GetChild(menuItemLayoutRoot, 0) as FrameworkElement;
+                var navItemPresenterLayoutRoot = VisualTreeHelper.GetChild(navItemPresenter, 0) as FrameworkElement;
+                var statesGroups = VisualStateManager.GetVisualStateGroups(navItemPresenterLayoutRoot);
+
+                foreach (VisualStateGroup visualStateGroup in statesGroups)
+                {
+                    Log.Comment($"VisualStateGroup1: Name={visualStateGroup.Name}, CurrentState={visualStateGroup.CurrentState.Name}");
+
+                    visualStateGroup.CurrentStateChanged += (object sender, VisualStateChangedEventArgs e) =>
+                    {
+                        Log.Comment($"VisualStateChangedEventArgs1: Name={e.Control.Name}, OldState={e.OldState.Name}, NewState={e.NewState.Name}");
+                        navItemPresenter1CurrentState = e.NewState.Name;
+                    };
+                }
+
+                menuItemLayoutRoot = VisualTreeHelper.GetChild(menuItem2, 0) as FrameworkElement;
+                navItemPresenter = VisualTreeHelper.GetChild(menuItemLayoutRoot, 0) as FrameworkElement;
+                navItemPresenterLayoutRoot = VisualTreeHelper.GetChild(navItemPresenter, 0) as FrameworkElement;
+                statesGroups = VisualStateManager.GetVisualStateGroups(navItemPresenterLayoutRoot);
+
+                foreach (VisualStateGroup visualStateGroup in statesGroups)
+                {
+                    Log.Comment($"VisualStateGroup2: Name={visualStateGroup.Name}, CurrentState={visualStateGroup.CurrentState.Name}");
+
+                    visualStateGroup.CurrentStateChanged += (object sender, VisualStateChangedEventArgs e) =>
+                    {
+                        Log.Comment($"VisualStateChangedEventArgs2: Name={e.Control.Name}, OldState={e.OldState.Name}, NewState={e.NewState.Name}");
+                        navItemPresenter2CurrentState = e.NewState.Name;
+                    };
+                }
+
                 Verify.IsFalse(menuItem1.IsSelected);
                 Verify.IsFalse(menuItem2.IsSelected);
-                Verify.AreEqual(navView.SelectedItem, null);
+                Verify.AreEqual(null, navView.SelectedItem);
 
                 menuItem1.IsSelected = true;
-                Content.UpdateLayout(true);
+                Content.UpdateLayout();
+            });
+            IdleSynchronizer.Wait();
+
+            RunOnUIThread.Execute(() =>
+            {
+                Verify.AreEqual("Selected", navItemPresenter1CurrentState);
+                Verify.AreEqual(string.Empty, navItemPresenter2CurrentState);
 
                 Verify.IsTrue(menuItem1.IsSelected);
                 Verify.IsFalse(menuItem2.IsSelected);
-                Verify.AreEqual(navView.SelectedItem, menuItem1);
+                Verify.AreEqual(menuItem1, navView.SelectedItem);
 
                 menuItem2.IsSelected = true;
-                Content.UpdateLayout(true);
+                Content.UpdateLayout();
+            });
+            IdleSynchronizer.Wait();
+
+            RunOnUIThread.Execute(() =>
+            {
+                Verify.AreEqual("Normal", navItemPresenter1CurrentState);
+                Verify.AreEqual("Selected", navItemPresenter2CurrentState);
 
                 Verify.IsTrue(menuItem2.IsSelected);
                 Verify.IsFalse(menuItem1.IsSelected, "MenuItem1 should have been deselected when MenuItem2 was selected");
-                Verify.AreEqual(navView.SelectedItem, menuItem2);
+                Verify.AreEqual(menuItem2, navView.SelectedItem);
             });
         }
 
@@ -478,13 +689,45 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
                 Verify.AreEqual(
                     AutomationControlType.ListItem,
                     NavigationViewItemAutomationPeer.CreatePeerForElement(menuItem1).GetAutomationControlType());
+                Verify.IsNull(NavigationViewItemAutomationPeer.CreatePeerForElement(menuItem1).GetPattern(PatternInterface.Invoke));
 
                 navView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
                 Content.UpdateLayout();
                 Verify.AreEqual(
                     AutomationControlType.TabItem,
                     NavigationViewItemAutomationPeer.CreatePeerForElement(menuItem1).GetAutomationControlType());
+                // Tabs should only provide SelectionItem pattern but not Invoke pattern
+                Verify.IsNull(NavigationViewItemAutomationPeer.CreatePeerForElement(menuItem1).GetPattern(PatternInterface.Invoke));
+            });
+        }
 
+        [TestMethod]
+        public void VerifyAutomationPeerExpandCollapsePatternBehavior()
+        {
+            RunOnUIThread.Execute(() =>
+            {
+
+                var menuItem1 = new NavigationViewItem();
+                var menuItem2 = new NavigationViewItem();
+                var menuItem3 = new NavigationViewItem();
+                var menuItem4 = new NavigationViewItem();
+                menuItem1.Content = "Item 1";
+                menuItem2.Content = "Item 2";
+                menuItem3.Content = "Item 3";
+                menuItem4.Content = "Item 4";
+
+                menuItem2.MenuItems.Add(menuItem3);
+                menuItem4.HasUnrealizedChildren = true;
+
+                var expandPeer = NavigationViewItemAutomationPeer.CreatePeerForElement(menuItem1).GetPattern(PatternInterface.ExpandCollapse);
+
+                Verify.IsNull(expandPeer,"Verify NavigationViewItem with no children has no ExpandCollapse pattern");
+
+                expandPeer = NavigationViewItemAutomationPeer.CreatePeerForElement(menuItem2).GetPattern(PatternInterface.ExpandCollapse);
+                Verify.IsNotNull(expandPeer,"Verify NavigationViewItem with children has an ExpandCollapse pattern provided");
+
+                expandPeer = NavigationViewItemAutomationPeer.CreatePeerForElement(menuItem4).GetPattern(PatternInterface.ExpandCollapse);
+                Verify.IsNotNull(expandPeer,"Verify NavigationViewItem without children but with UnrealizedChildren set to true has an ExpandCollapse pattern provided");
             });
         }
 
@@ -564,16 +807,16 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
         [TestMethod]
         public void VerifyVerifyHeaderContentMarginOnTopNav()
         {
-            VerifyVerifyHeaderContentMargin(NavigationViewPaneDisplayMode.Top, "VerifyVerifyHeaderContentMarginOnTopNav");
+            VerifyHeaderContentMargin(NavigationViewPaneDisplayMode.Top, "VerifyVerifyHeaderContentMarginOnTopNav");
         }
 
         [TestMethod]
-        public void VerifyVerifyHeaderContentMarginOnMinimalNav()
+        public void VerifyHeaderContentMarginOnMinimalNav()
         {
-            VerifyVerifyHeaderContentMargin(NavigationViewPaneDisplayMode.LeftMinimal, "VerifyVerifyHeaderContentMarginOnMinimalNav");
+            VerifyHeaderContentMargin(NavigationViewPaneDisplayMode.LeftMinimal, "VerifyVerifyHeaderContentMarginOnMinimalNav");
         }
 
-        private void VerifyVerifyHeaderContentMargin(NavigationViewPaneDisplayMode paneDisplayMode, string masterFilePrefix)
+        private void VerifyHeaderContentMargin(NavigationViewPaneDisplayMode paneDisplayMode, string masterFilePrefix)
         {
             UIElement headerContent = null;
 
@@ -603,7 +846,7 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
                 var navView = new NavigationView();
                 MUXControlsTestApp.App.TestContentRoot = navView;
 
-                navView.MenuItemsSource = new ObservableCollection<String> { "Item 1", "Item 2" }; ;
+                navView.MenuItemsSource = new ObservableCollection<string> { "Item 1", "Item 2" }; ;
                 navView.Width = 1008; // forces the control into Expanded mode so that the menu renders
 
                 MUXControlsTestApp.App.TestContentRoot.UpdateLayout(true);
@@ -612,11 +855,11 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
                 var menuItem = "Item 2";
                 // Get container for item
                 var itemContainer = navView.ContainerFromMenuItem(menuItem) as NavigationViewItem;
-                bool correctContainerReturned = itemContainer != null && (itemContainer.Content as String) == menuItem;
+                bool correctContainerReturned = itemContainer != null && (itemContainer.Content as string) == menuItem;
                 Verify.IsTrue(correctContainerReturned, "Correct container should be returned for passed in menu item.");
 
                 // Get item for container
-                var returnedItem = navView.MenuItemFromContainer(itemContainer) as String;
+                var returnedItem = navView.MenuItemFromContainer(itemContainer) as string;
                 bool correctItemReturned = returnedItem != null && returnedItem == menuItem;
                 Verify.IsTrue(correctItemReturned, "Correct item should be returned for passed in container.");
 
@@ -713,6 +956,146 @@ namespace ModernWpf.Tests.MUXControls.ApiTests
 
                 // If we don't get here, app has crashed. This verify is just making sure code got run
                 Verify.IsTrue(true);
+            });
+        }
+
+        [TestMethod]
+        public void VerifyExpandCollapseChevronVisibility()
+        {
+            NavigationView navView = null;
+            NavigationViewItem parentItem = null;
+            ObservableCollection<string> children = null;
+
+            RunOnUIThread.Execute(() =>
+            {
+                navView = new NavigationView();
+                Content = navView;
+
+                children = new ObservableCollection<string>();
+                parentItem = new NavigationViewItem() { Content = "ParentItem", MenuItemsSource = children };
+
+                navView.MenuItems.Add(parentItem);
+
+                navView.Width = 1008; // forces the control into Expanded mode so that the menu renders
+                Content.UpdateLayout(true);
+
+                UIElement chevronUIElement = (UIElement)VisualTreeUtils.FindVisualChildByName(parentItem, "ExpandCollapseChevron");
+                Verify.IsTrue(chevronUIElement.Visibility == Visibility.Collapsed, "chevron should have been collapsed as NavViewItem has no children");
+
+                // Add a child to parentItem through the MenuItemsSource API. This should make the chevron visible.
+                children.Add("Child 1");
+                Content.UpdateLayout(true);
+
+                Verify.IsTrue(chevronUIElement.Visibility == Visibility.Visible, "chevron should have been visible as NavViewItem now has children");
+
+                // Remove all children of parentItem. This should collapse the chevron
+                children.Clear();
+                Content.UpdateLayout(true);
+
+                Verify.IsTrue(chevronUIElement.Visibility == Visibility.Collapsed, "chevron should have been collapsed as NavViewItem no longer has children");
+
+                // Add a child to parentItem and set the MenuItemsSource as null. This should collapse the chevron
+                children.Add("Child 2");
+                Content.UpdateLayout(true);
+
+                // we are doing this so that when we set MenuItemsSource as null, we can check if the chevron's visibility really changes
+                Verify.IsTrue(chevronUIElement.Visibility == Visibility.Visible, "chevron should have been visible as NavViewItem now has children");
+
+                parentItem.MenuItemsSource = null;
+                Content.UpdateLayout(true);
+
+                Verify.IsTrue(chevronUIElement.Visibility == Visibility.Collapsed, "chevron should have been collapsed as NavViewItem no longer has children");
+
+                // Add a child to parentItem through the MenuItems API. This should make the chevron visible.
+                parentItem.MenuItems.Add(new NavigationViewItem() { Content = "Child 3" });
+                Content.UpdateLayout(true);
+
+                Verify.IsTrue(chevronUIElement.Visibility == Visibility.Visible, "chevron should have been visible as NavViewItem now has children");
+
+                // Remove all children of parentItem. This should collapse the chevron
+                parentItem.MenuItems.Clear();
+                Content.UpdateLayout(true);
+
+                Verify.IsTrue(chevronUIElement.Visibility == Visibility.Collapsed, "chevron should have been collapsed as NavViewItem no longer has children");
+            });
+        }
+
+        [TestMethod]
+        public void VerifyOverflowButtonToolTip()
+        {
+            RunOnUIThread.Execute(() =>
+            {
+                var navView = new NavigationView();
+                navView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
+
+                Content = navView;
+                Content.UpdateLayout();
+
+                var overflowButton = VisualTreeUtils.FindVisualChildByName(navView, "TopNavOverflowButton") as Button;
+                var toolTipObject = ToolTipService.GetToolTip(overflowButton);
+
+                bool testCondition = toolTipObject is ToolTip toolTip && toolTip.Content.Equals("More");
+                Verify.IsTrue(testCondition, "ToolTip text should have been \"More\".");
+            });
+        }
+
+        [TestMethod]
+        public void VerifyClearingItemsCollectionDoesNotCrashWhenItemSelectedOnTopNav()
+        {
+            RunOnUIThread.Execute(() =>
+            {
+                var navView = new NavigationView();
+                navView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
+
+                var navViewItem1 = new NavigationViewItem() { Content = "MenuItem 1", };
+                var navViewItem2 = new NavigationViewItem() { Content = "MenuItem 2" };
+
+                Log.Comment("Set up the MenuItems collection");
+                navView.MenuItems.Add(navViewItem1);
+                navView.MenuItems.Add(navViewItem2);
+
+                Content = navView;
+                Content.UpdateLayout();
+
+                Log.Comment("Set MenuItem 1 as selected");
+                navView.SelectedItem = navViewItem1;
+                Verify.AreEqual(navViewItem1, navView.SelectedItem, "MenuItem 1 should have been selected");
+
+                // Clearing the MenuItems collection should not crash the app
+                Log.Comment("Clear the MenuItems collection");
+                navView.MenuItems.Clear();
+
+                Log.Comment("Set up the MenuItemsSource collection");
+                var itemsSource = new ObservableCollection<NavigationViewItem>() { navViewItem1, navViewItem2 };
+                navView.MenuItemsSource = itemsSource;
+
+                Content.UpdateLayout();
+
+                Log.Comment("Set MenuItem 1 as selected");
+                navView.SelectedItem = navViewItem1;
+                Verify.AreEqual(navViewItem1, navView.SelectedItem, "MenuItem 1 should have been selected");
+
+                // Clearing the MenuItemsSource collection should not crash the app
+                Log.Comment("Clear the MenuItemsSource collection");
+                itemsSource.Clear();
+            });
+        }
+
+        [TestMethod]
+        public void VerifyHierarchicalNavigationTopModeMenuItemsSourceDoesNotCrash()
+        {
+            RunOnUIThread.Execute(() =>
+            {
+                var navView = new NavigationView();
+                Content = navView;
+
+                navView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
+
+                var childItem = new NavigationViewItem() { Content = "Item 1.1" };
+                var parentItem = new NavigationViewItem() { Content = "Item 1", MenuItemsSource = new ObservableCollection<NavigationViewItem>() { childItem } };
+                navView.MenuItemsSource = new ObservableCollection<NavigationViewItem>() { parentItem };             
+
+                Content.UpdateLayout();
             });
         }
     }

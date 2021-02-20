@@ -13,14 +13,19 @@
             <Setter.Value>
                 <ControlTemplate TargetType="local:RadioButtons">
                     <StackPanel SnapsToDevicePixels="True">
-                        <ContentPresenter
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Disabled" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ContentPresenter x:Name="HeaderContentPresenter"
                             Content="{TemplateBinding Header}"
                             ContentTemplate="{TemplateBinding HeaderTemplate}"
-                            Margin="{DynamicResource RadioButtonsHeaderMargin}"
+                            TextElement.Foreground="{DynamicResource RadioButtonsHeaderForeground}"
+                            Margin="{DynamicResource RadioButtonsTopHeaderMargin}"
                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                        <local:ItemsRepeater
-                            x:Name="InnerRepeater"
-                            ItemTemplate="{TemplateBinding ItemTemplate}">
+                        <local:ItemsRepeater x:Name="InnerRepeater">
                             <local:ItemsRepeater.Layout>
                                 <primitives:ColumnMajorUniformToLargestGridLayout
                                     ColumnSpacing="{DynamicResource RadioButtonsColumnSpacing}"
@@ -28,6 +33,11 @@
                             </local:ItemsRepeater.Layout>
                         </local:ItemsRepeater>
                     </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="HeaderContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource RadioButtonsHeaderForegroundDisabled}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

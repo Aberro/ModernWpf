@@ -27,13 +27,13 @@ namespace ModernWpf.Controls
             if (m_appliedTemplate)
             {
                 const string groupName = "NavigationSeparatorLineStates";
-                var stateName = (Position != NavigationViewRepeaterPosition.TopPrimary)
+                var stateName = (Position != NavigationViewRepeaterPosition.TopPrimary && Position != NavigationViewRepeaterPosition.TopFooter)
                     ? m_isClosedCompact
                         ? "HorizontalLineCompact"
                         : "HorizontalLine"
                     : "VerticalLine";
 
-                VisualStateUtil.GotToStateIfGroupExists(this, groupName, stateName, false /*useTransitions*/);
+                VisualStateUtil.GoToStateIfGroupExists(this, groupName, stateName, false /*useTransitions*/);
             }
         }
 
@@ -61,14 +61,14 @@ namespace ModernWpf.Controls
             UpdateItemIndentation();
         }
 
-        private protected override void OnNavigationViewRepeaterPositionChanged()
+        private protected override void OnNavigationViewItemBaseDepthChanged()
         {
             UpdateVisualState(false /*useTransition*/);
         }
 
-        private protected override void OnNavigationViewItemBaseDepthChanged()
+        private protected override void OnNavigationViewItemBasePositionChanged()
         {
-            UpdateItemIndentation();
+            UpdateVisualState(false /*useTransition*/);
         }
 
         void OnSplitViewPropertyChanged(DependencyObject sender, DependencyProperty args)

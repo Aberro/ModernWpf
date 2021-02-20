@@ -165,7 +165,7 @@ namespace ModernWpf.Tests.MUXControls.ApiTests.RepeaterTests
                 repeater.UpdateLayout();
 
                 realized = VerifyRealizedRange(repeater, dataSource);
-                Verify.IsLessThanOrEqual(3, realized);
+                Verify.IsLessThanOrEqual(2, realized);
             });
         }
 
@@ -300,6 +300,59 @@ namespace ModernWpf.Tests.MUXControls.ApiTests.RepeaterTests
 
                 Log.Comment("Replace after realized range");
                 dataSource.Replace(index: 8, oldCount: 1, newCount: 1, reset: false);
+                repeater.UpdateLayout();
+
+                realized = VerifyRealizedRange(repeater, dataSource);
+                Verify.AreEqual(4, realized);
+            });
+        }
+
+        [TestMethod]
+        public void CanMoveItem()
+        {
+            CustomItemsSource dataSource = null;
+            RunOnUIThread.Execute(() => dataSource = new CustomItemsSource(Enumerable.Range(0, 10).ToList()));
+            ScrollViewer scrollViewer = null;
+            ItemsRepeater repeater = null;
+            var viewChangedEvent = new ManualResetEvent(false);
+
+            RunOnUIThread.Execute(() =>
+            {
+                repeater = SetupRepeater(dataSource, ref scrollViewer);
+                scrollViewer.ScrollChanged += (sender, args) =>
+                {
+                    if (args.HorizontalChange != 0 || args.VerticalChange != 0)
+                    {
+                        viewChangedEvent.Set();
+                    }
+                };
+                scrollViewer.ChangeView(null, 400, null, true);
+            });
+
+            Verify.IsTrue(viewChangedEvent.WaitOne(DefaultWaitTime), "Waiting for ViewChanged.");
+            IdleSynchronizer.Wait();
+
+            RunOnUIThread.Execute(() =>
+            {
+                var realized = VerifyRealizedRange(repeater, dataSource);
+                Verify.AreEqual(4, realized);
+
+                Log.Comment("Move before realized range.");
+                dataSource.Move(oldIndex: 0, newIndex: 1, count: 2, reset: false);
+                repeater.UpdateLayout();
+
+                realized = VerifyRealizedRange(repeater, dataSource);
+                Verify.AreEqual(4, realized);
+
+                Log.Comment("Move in realized range.");
+                dataSource.Move(oldIndex: 3, newIndex: 5, count: 2, reset: false);
+                repeater.UpdateLayout();
+
+                realized = VerifyRealizedRange(repeater, dataSource);
+                Verify.AreEqual(4, realized);
+
+                Log.Comment("Move after realized range");
+                dataSource.Move(oldIndex: 7, newIndex: 8, count: 2, reset: false);
                 repeater.UpdateLayout();
 
                 realized = VerifyRealizedRange(repeater, dataSource);
