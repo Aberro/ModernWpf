@@ -855,6 +855,8 @@
         <Setter Property="PaneToggleButtonStyle" Value="{DynamicResource PaneToggleButtonStyle}" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="CompactPaneLength" Value="{DynamicResource NavigationViewCompactPaneLength}" />
+		<Setter Property="PaneBackground" Value="{DynamicResource NavigationViewDefaultPaneBackground}" />
+		<Setter Property="ExpandedPaneBackground" Value="{DynamicResource NavigationViewExpandedPaneBackground}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:NavigationView">
@@ -1195,7 +1197,7 @@
                                 IsPaneOpen="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsPaneOpen, Mode=TwoWay}"
                                 IsTabStop="False"
                                 OpenPaneLength="{TemplateBinding OpenPaneLength}"
-                                PaneBackground="{DynamicResource NavigationViewDefaultPaneBackground}"
+                                PaneBackground="{TemplateBinding PaneBackground}"
                             
                                 Grid.Row="1">
 
@@ -1363,7 +1365,7 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger SourceName="DisplayModeGroupListener" Property="CurrentStateName" Value="Expanded">
-                            <Setter TargetName="RootSplitView" Property="PaneBackground" Value="{DynamicResource NavigationViewExpandedPaneBackground}" />
+                            <Setter TargetName="RootSplitView" Property="PaneBackground" Value="{Binding ExpandedPaneBackground, RelativeSource={RelativeSource Self}}" />
                         </Trigger>
                         <Trigger SourceName="DisplayModeGroupListener" Property="CurrentStateName" Value="Minimal">
                             <Setter TargetName="HeaderContent" Property="Margin" Value="{DynamicResource NavigationViewMinimalHeaderMargin}" />
